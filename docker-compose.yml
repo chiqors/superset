@@ -1,0 +1,60 @@
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: superset-postgres
+    environment:
+      POSTGRES_USER: superset
+      POSTGRES_PASSWORD: superset
+      POSTGRES_DB: superset
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U superset"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  superset:
+    build:
+      context: ./docker
+    container_name: superset
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8088"
+    environment:
+      SUPERSET_SECRET_KEY: "replace_with_secure_key"
+      SUPERSET_LOAD_EXAMPLES: "no"
+      SQLALCHEMY_DATABASE_URI: "postgresql://superset:superset@postgres:5432/superset"
+    volumes:
+      - ./data:/data:ro
+    restart: unless-stopped
+
+  superset-init:
+    build:
+      context: ./docker
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SUPERSET_SECRET_KEY: "replace_with_secure_key"
+      SUPERSET_LOAD_EXAMPLES: "no"
+      SQLALCHEMY_DATABASE_URI: "postgresql://superset:superset@postgres:5432/superset"
+      ADMIN_USERNAME: "admin"
+      ADMIN_PASSWORD: "admin"
+      ADMIN_EMAIL: "admin@superset.com"
+    command: >
+      /bin/bash -c "
+        superset db upgrade &&
+        ( superset fab list-users | grep -q \"^$${ADMIN_USERNAME}\\b\" || superset fab create-admin --username $${ADMIN_USERNAME} --firstname Superset --lastname Admin --email $${ADMIN_EMAIL} --password $${ADMIN_PASSWORD} ) &&
+        superset init &&
+        superset set_database_uri -d DuckDB-memory -u duckdb:///:memory: || true
+      "
+    restart: "no"
+
+volumes:
+  pgdata:

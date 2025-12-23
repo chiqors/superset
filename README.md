@@ -1,23 +1,19 @@
-# Apache Superset – DuckDB
-This repo presents a minimal setup to read `Parquet`, `JSON`, and `CSV` files with Apache Superset. Using an _in-memory_ DuckDB database, a live data connection is made between Superset and a filesystem.
+# Apache Superset
+This repo showcases a minimal setup with pre-configured database connections for `BigQuery`, `DuckDB`, `PostgreSQL`, and `Trino`.
 
-# Custom Docker image
-Execute the steps below to setup a local Apache Superset instance—with DuckDB support—using Docker.
+It also presents a minimal setup to read `Parquet`, `JSON`, and `CSV` files with Apache Superset. Using an _in-memory_ DuckDB database, a live data connection is made between Superset and a filesystem.
 
 ## Build the image
 ```Shell
-docker build -t jorritsandbrink/superset-duckdb docker
+docker build -t chiqors/superset docker
 ```
 
-## Run the container
+## Run with Docker Compose (Postgres metadata)
 ```Shell
-docker run -d -p 8080:8088 \
-    -e "SUPERSET_SECRET_KEY=your_secret_key" \
-    --mount type=bind,source=/$(pwd)/data,target=/data \
-    --name superset-duckdb \
-    jorritsandbrink/superset-duckdb
+docker compose up -d
 ```
-> Note: the local `/data` folder is mounted to make the data files accessible from within the container.
+> Note: the local `./data` folder is mounted to make the data files accessible from within the container. Update `SUPERSET_SECRET_KEY` in `docker-compose.yml` with a strong key for production.
+
 ## Setup Superset
 ```Shell
 ./docker/setup.sh
@@ -68,8 +64,3 @@ FROM '/data/json_table/*.json'
 SELECT *
 FROM '/data/csv_table/*.csv'
 ```
-
-# References
--  [Portable Data Stack](https://github.com/cnstlungu/portable-data-stack-dagster/tree/main)
-- [Preparing Apache Superset to working with Delta Lake, DuckDB, Prophet, Python LDAP Active Directory, Jinja and MS-SQL driver using Ubuntu](https://medium.com/@syarifz.id/preparing-apache-superset-to-working-with-delta-lake-duckdb-prophet-python-ldap-active-d9da7a9a68c3)
-- [Create DuckDB Connection and Dataset using Delta Lake Parquet File in Apache Superset](https://medium.com/@syarifz.id/create-duckdb-connection-and-create-dataset-using-parquet-file-in-apache-superset-8765e5772342)

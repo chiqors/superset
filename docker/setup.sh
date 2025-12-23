@@ -1,5 +1,5 @@
 # Create admin user.
-docker exec -it superset-duckdb superset fab create-admin \
+docker exec -it superset superset fab create-admin \
     --username admin \
     --firstname Superset \
     --lastname Admin \
@@ -7,12 +7,12 @@ docker exec -it superset-duckdb superset fab create-admin \
     --password admin
 
 # Upgrade database to latest.
-docker exec -it superset-duckdb superset db upgrade
+docker exec -it superset superset db upgrade
 
 # Setup roles.
-docker exec -it superset-duckdb superset init
+docker exec -it superset superset init
 
 # Create database connection for DuckDB.
-docker exec -it superset-duckdb superset set_database_uri \
+docker exec -it superset superset set_database_uri \
     -d DuckDB-memory \
     -u duckdb:///:memory:
