@@ -1,5 +1,5 @@
 # Apache Superset
-This repo showcases a minimal setup with pre-configured database connections for `BigQuery`, `DuckDB`, `PostgreSQL`, and `Trino`.
+This repo showcases a minimal setup with pre-configured database connections for `BigQuery`, `DuckDB`, and `PostgreSQL`.
 
 It also presents a minimal setup to read `Parquet`, `JSON`, and `CSV` files with Apache Superset. Using an _in-memory_ DuckDB database, a live data connection is made between Superset and a filesystem.
 
